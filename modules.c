@@ -2,55 +2,78 @@
 #include <stdio.h>
 #include <string.h>
 #include "tabdispersao.h"
-#include "lista.h"
+#include "heap.h"
 
-lista* list;
+#define ERROR -1
+#define ALL_GOOD  1
+
+heap *min, *max;
+
 tabela_dispersao* td = NULL;
 objeto* mode = NULL;
 
 void median_initModule(int maxTransactions) {
-  list = lista_nova();
+  min = heap_nova(maxTransactions/2 + 1, MINHEAP);
+  max = heap_nova(maxTransactions/2, MAXHEAP);
 }
 
 int median_newObservation(int numActions, float *updatedMedian) {
-  if( lista_insere(list, numActions) == NULL)
-    return -1;
-  
-  int t = lista_tamanho(list);
+  if(!heap_insere(max, numActions, numActions))
+    return ERROR;
 
-  if(t == -1 || t == 0)
-    return -1;
-  else if (t % 2) {
-    *updatedMedian = lista_meio(list)->valor;
-    return 1;
+  if(max->tamanho - min->tamanho > 1) {
+    int aux = heap_remove(max);
+    if(aux == -1)
+      return ERROR;
+    
+    if(!heap_insere(min, aux, aux))
+      return ERROR;
   }
-  else {
-    l_elemento* meio = lista_meio(list);
-    *updatedMedian = (float)(meio->valor + meio->proximo->valor) / 2;
-    return 1;
+
+  if(min->elementos[0] != NULL && max->elementos[0]->valor > min->elementos[0]->valor) {
+    int aux = heap_remove(max);
+    int aux2 = heap_remove(min);
+    
+    if(!heap_insere(min, aux, aux))
+      return ERROR;
+    if(!heap_insere(max, aux2, aux2))
+      return ERROR;
   }
+
+  if( (max->tamanho + min->tamanho) % 2 )
+    *updatedMedian = max->elementos[0]->valor;
+  else
+    *updatedMedian = (float)(max->elementos[0]->valor + min->elementos[0]->valor) / 2;
+  
+  /*mostraHeap(max, 0);
+  printf("______________________\n");
+  mostraHeap(min, 0);
+  printf("pppppppppppppppppppppp\n");*/
+
+  return ALL_GOOD;
 }
 
 void median_closeModule() {
-  lista_apaga(list);
+  heap_apaga(min);
+  heap_apaga(max);
 }
 
 void mode_initModule(int maxTransactions) {
-  td = tabela_nova(maxTransactions/4, &hash_djbm);
+  td = tabela_nova(maxTransactions/3, &hash_djbm);
 }
 
 int mode_newObservation(const char *companyName, char *updatedMode) {
   objeto* obj;
 
   if(tabela_insere(td, companyName, &obj) != TABDISPERSAO_OK)
-    return -1;
+    return ERROR;
   
   if(mode == NULL || obj->valor > mode->valor)
     mode = obj;
     
   strcpy(updatedMode, mode->chave);
   //printf("%s\n", updatedMode);
-  return 1;
+  return ALL_GOOD;
 }
 
 void mode_closeModule() {
