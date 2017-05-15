@@ -12,8 +12,8 @@
 #define FILHO_ESQ(x) 	((x*2)+1)
 #define FILHO_DIR(x) 	((x*2)+2)
 
-int menor_que(elemento * e1, elemento * e2);
-int maior_que(elemento * e1, elemento * e2);
+int menor_que(int e1, int e2);
+int maior_que(int e1, int e2);
 
 heap* heap_nova(int capacidade, int tipo_de_heap) {
 	heap * h = (heap *) malloc(sizeof(heap));
@@ -23,7 +23,7 @@ heap* heap_nova(int capacidade, int tipo_de_heap) {
 
 	h->tamanho = 0;
 	h->capacidade = capacidade;
-	h->elementos = (elemento **) calloc(capacidade, sizeof(elemento *));
+	h->elementos = (int*) calloc(capacidade, sizeof(int));
 	h->tipo_de_heap = tipo_de_heap;
 
 	if (!h->elementos) {
@@ -35,47 +35,24 @@ heap* heap_nova(int capacidade, int tipo_de_heap) {
 }
 
 void heap_apaga(heap *h) {
-	int i;
-
 	if(!h)
 		return;
-
-	/* apaga todos os elementos e respetivas strings */
-	for(i=0; i<h->tamanho; i++) {
-		free(h->elementos[i]);
-		h->elementos[i]=NULL;
-	}
 
 	free(h->elementos);
 	free(h);
 }
 
-elemento * elemento_novo(int valor) {
-	elemento * elem = (elemento *) malloc(sizeof(elemento));
-
-	if (!elem)
-		return NULL;
-
-	elem->valor = valor;
-
-	return elem;
-}
-
 int heap_insere(heap * h, int valor) {
-	elemento * aux, * elem;
+	int aux, elem;
 	int i;
 
 	/* se heap esta' cheia, nao insere elemento */
 	if (h->tamanho >= h->capacidade)
 		return 0;
 
-	elem = elemento_novo(valor);
-	if (!elem)
-		return 0;
-
 	/* coloca elemento no fim da heap */
 	i = h->tamanho;
-	h->elementos[i] = elem;
+	h->elementos[i] = valor;
 	h->tamanho++;
 
 	if(h->tipo_de_heap == MINHEAP) {
@@ -103,21 +80,18 @@ int heap_insere(heap * h, int valor) {
 }
 
 int heap_remove(heap * h) {
-	int i, filho_maior, filho_menor;
-	elemento * aux;
-	int ret;
+	int i, filho_maior, filho_menor, aux, ret;
 
 	/* se heap estiver vazia, nao remove elemento */
 	if (!h || h->tamanho <= 0)
 		return -1;
 
-	ret = h->elementos[RAIZ]->valor;
-	free(h->elementos[RAIZ]);
+	ret = h->elementos[RAIZ];
 
 	/* coloca ultimo elemento da heap na raiz */
 	h->tamanho--;
 	h->elementos[RAIZ] = h->elementos[h->tamanho];
-	h->elementos[h->tamanho] = NULL;
+	h->elementos[h->tamanho] = 0;
 
 	i = RAIZ;
 
@@ -175,7 +149,7 @@ void mostraHeap(heap *h, int indice) {
 		for(i = 0; i < 3 * nivel; i++)
 			printf("     ");
 
-		printf("%d\n",h->elementos[indice]->valor);
+		printf("%d\n", h->elementos[indice]);
 
 		mostraHeap(h, FILHO_DIR(indice));
 	}
@@ -184,16 +158,12 @@ void mostraHeap(heap *h, int indice) {
 		printf("\n");
 }
 
-int menor_que(elemento * e1, elemento * e2) {
-	if (e1 == NULL || e2 == NULL)
-		return 0;
+int menor_que(int e1, int e2) {
 
-	return e1->valor < e2->valor;
+	return e1 < e2;
 }
 
-int maior_que(elemento * e1, elemento * e2) {
-	if (e1 == NULL || e2 == NULL)
-		return 0;
+int maior_que(int e1, int e2) {
 
-	return e1->valor > e2->valor;
+	return e1 > e2;
 }

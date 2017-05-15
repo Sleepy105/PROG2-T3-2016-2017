@@ -9,17 +9,13 @@
 #define MAXHEAP 1
 
 typedef struct {
-	int valor;
-} elemento;
-
-typedef struct {
 	/* numero de elementos no vetor */
 	int tamanho;
 	/* tamanho maximo do vetor */
 	int capacidade;
 
 	/* vetor de apontadores para elementos */
-	elemento ** elementos;
+	int* elementos;
 
 	/* tipo de heap */
 	int tipo_de_heap;

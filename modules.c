@@ -43,7 +43,7 @@ int median_newObservation(int numActions, float *updatedMedian) {
             }
 
             // Agora ambas as heaps têm o mesmo número de elementos
-            m = *updatedMedian = (float)(max->elementos[0]->valor + min->elementos[0]->valor) / 2;
+            m = *updatedMedian = (float)(max->elementos[0] + min->elementos[0]) / 2;
 
             break;
 
@@ -52,12 +52,12 @@ int median_newObservation(int numActions, float *updatedMedian) {
             if(numActions < m) {
                 if(!heap_insere(max, numActions))
                     return ERROR;
-                m = *updatedMedian = (float)(max->elementos[0]->valor);
+                m = *updatedMedian = (float)(max->elementos[0]);
             }
             else {
                 if(!heap_insere(min, numActions))
                     return ERROR;
-                m = *updatedMedian = (float)(min->elementos[0]->valor);
+                m = *updatedMedian = (float)(min->elementos[0]);
             }
 
             break;
@@ -80,7 +80,7 @@ int median_newObservation(int numActions, float *updatedMedian) {
                     return ERROR;
             }
 
-            m = *updatedMedian = (float)(max->elementos[0]->valor + min->elementos[0]->valor) / 2;
+            m = *updatedMedian = (float)(max->elementos[0] + min->elementos[0]) / 2;
 
             break;
     }
@@ -125,7 +125,6 @@ int mode_newObservation(const char *companyName, char *updatedMode) {
         mode = obj;
     
     strcpy(updatedMode, mode->chave);
-    //printf("%s\n", updatedMode);
     return ALL_GOOD;
 }
 
