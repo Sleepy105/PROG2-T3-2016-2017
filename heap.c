@@ -12,9 +12,6 @@
 #define FILHO_ESQ(x) 	((x*2)+1)
 #define FILHO_DIR(x) 	((x*2)+2)
 
-int menor_que(int e1, int e2);
-int maior_que(int e1, int e2);
-
 heap* heap_nova(int capacidade, int tipo_de_heap) {
 	heap * h = (heap *) malloc(sizeof(heap));
 
@@ -43,8 +40,7 @@ void heap_apaga(heap *h) {
 }
 
 int heap_insere(heap * h, int valor) {
-	int aux, elem;
-	int i;
+	int aux, i;
 
 	/* se heap esta' cheia, nao insere elemento */
 	if (h->tamanho >= h->capacidade)
@@ -57,7 +53,7 @@ int heap_insere(heap * h, int valor) {
 
 	if(h->tipo_de_heap == MINHEAP) {
 		/* enquanto elemento for mais prioritario do que o respetivo pai, troca-os */
-		while (i != RAIZ && menor_que(h->elementos[i], h->elementos[PAI(i)])) {
+		while (i != RAIZ && h->elementos[i] < h->elementos[PAI(i)]) {
 			aux = h->elementos[PAI(i)];
 			h->elementos[PAI(i)] = h->elementos[i];
 			h->elementos[i] = aux;
@@ -66,7 +62,7 @@ int heap_insere(heap * h, int valor) {
 	}
 	else if(h->tipo_de_heap == MAXHEAP) {
 		/* enquanto elemento for menos prioritario do que o respetivo pai, troca-os */
-		while (i != RAIZ && maior_que(h->elementos[i], h->elementos[PAI(i)])) {
+		while (i != RAIZ && h->elementos[i] > h->elementos[PAI(i)]) {
 			aux = h->elementos[PAI(i)];
 			h->elementos[PAI(i)] = h->elementos[i];
 			h->elementos[i] = aux;
@@ -101,14 +97,14 @@ int heap_remove(heap * h) {
 		filho_menor = FILHO_DIR(i);
 
 		/* verifica se existe filho 'a direita e se este e' mais prioritario do que 'a esquerda */
-		if (FILHO_DIR(i) < h->tamanho && menor_que(h->elementos[FILHO_DIR(i)], h->elementos[FILHO_ESQ(i)])) {
+		if (FILHO_DIR(i) < h->tamanho && h->elementos[FILHO_DIR(i)] < h->elementos[FILHO_ESQ(i)]) {
 			filho_maior = FILHO_DIR(i);
 			filho_menor = FILHO_ESQ(i);
 		}
 
 		/* enquanto elemento for mais prioritario do que o respetivo pai, troca-os */
 		if(h->tipo_de_heap == MINHEAP) {
-			if (menor_que(h->elementos[filho_maior], h->elementos[i])) {
+			if (h->elementos[filho_maior] < h->elementos[i]) {
 				aux = h->elementos[filho_maior];
 				h->elementos[filho_maior] = h->elementos[i];
 				h->elementos[i] = aux;
@@ -118,7 +114,7 @@ int heap_remove(heap * h) {
 				break;
 		}
 		else if(h->tipo_de_heap == MAXHEAP) {
-			if (maior_que(h->elementos[filho_menor], h->elementos[i])) {
+			if (h->elementos[filho_menor] > h->elementos[i]) {
 				aux = h->elementos[filho_menor];
 				h->elementos[filho_menor] = h->elementos[i];
 				h->elementos[i] = aux;
@@ -156,14 +152,4 @@ void mostraHeap(heap *h, int indice) {
 
 	if (nivel == 0)
 		printf("\n");
-}
-
-int menor_que(int e1, int e2) {
-
-	return e1 < e2;
-}
-
-int maior_que(int e1, int e2) {
-
-	return e1 > e2;
 }
