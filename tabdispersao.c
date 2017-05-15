@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include "tabdispersao.h"
 
-tabela_dispersao* tabela_nova(int tamanho, hash_func *hfunc)
-{
+tabela_dispersao* tabela_nova(int tamanho, hash_func *hfunc) {
     /* aloca memoria para a estrutura tabela_dispersao */
     if (tamanho < 1 || hfunc == NULL)
         return NULL;
@@ -30,8 +29,7 @@ tabela_dispersao* tabela_nova(int tamanho, hash_func *hfunc)
     return t;
 }
 
-void tabela_apaga(tabela_dispersao *td)
-{
+void tabela_apaga(tabela_dispersao *td) {
     int i;
     td_elemento *elem, *aux;
 
@@ -57,8 +55,7 @@ void tabela_apaga(tabela_dispersao *td)
     free(td);
 }
 
-int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj)
-{
+int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj) {
     int index;
     td_elemento * elem;
 
@@ -103,8 +100,7 @@ int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj)
     return TABDISPERSAO_OK;
 }
 
-int tabela_remove(tabela_dispersao *td, const char *chave)
-{
+int tabela_remove(tabela_dispersao *td, const char *chave) {
     int index;
     td_elemento * elem, * aux;
 
@@ -139,8 +135,7 @@ int tabela_remove(tabela_dispersao *td, const char *chave)
     return TABDISPERSAO_NAOEXISTE;
 }
 
-int tabela_existe(tabela_dispersao *td, const char *chave)
-{
+int tabela_existe(tabela_dispersao *td, const char *chave) {
     if (!chave || !td) return TABDISPERSAO_ERRO;
 
     int c = tabela_valor(td, chave);
@@ -150,8 +145,7 @@ int tabela_existe(tabela_dispersao *td, const char *chave)
     return TABDISPERSAO_EXISTE;
 }
 
-int tabela_valor(tabela_dispersao *td, const char *chave)
-{
+int tabela_valor(tabela_dispersao *td, const char *chave) {
     int index;
     td_elemento * elem;
 
@@ -172,8 +166,7 @@ int tabela_valor(tabela_dispersao *td, const char *chave)
     return -1;
 }
 
-int tabela_esvazia(tabela_dispersao *td)
-{
+int tabela_esvazia(tabela_dispersao *td) {
     int i;
     td_elemento * elem, * aux;
 
@@ -196,8 +189,7 @@ int tabela_esvazia(tabela_dispersao *td)
     return TABDISPERSAO_OK;
 }
 
-int tabela_numelementos(tabela_dispersao *td)
-{
+int tabela_numelementos(tabela_dispersao *td) {
     int i, count = 0;
     td_elemento * elem;
 
@@ -216,8 +208,7 @@ int tabela_numelementos(tabela_dispersao *td)
     return count;
 }
 
-objeto * tabela_elementos(tabela_dispersao *td, int *n)
-{
+objeto * tabela_elementos(tabela_dispersao *td, int *n) {
     objeto *v;
     int i, j;
     td_elemento * elem;
@@ -248,8 +239,7 @@ objeto * tabela_elementos(tabela_dispersao *td, int *n)
     return v;
 }
 
-unsigned long hash_krm(const char* chave, int tamanho)
-{
+unsigned long hash_krm(const char* chave, int tamanho) {
     unsigned long h, i;
     h = 7;
     i = 0;
@@ -260,8 +250,7 @@ unsigned long hash_krm(const char* chave, int tamanho)
     return h % tamanho;
 }
 
-unsigned long hash_djbm(const char* chave, int tamanho)
-{
+unsigned long hash_djbm(const char* chave, int tamanho) {
     unsigned long h, i;
     i = 0;
     h = 5347;
@@ -276,9 +265,19 @@ unsigned long hash_djbm(const char* chave, int tamanho)
     return h % tamanho;
 }
 
+unsigned long hash_djb2m(const char* chave, int tamanho) {
+    register unsigned long h, i;
+    i = 0;
+    h = 5381;
+
+    while(chave[i])
+        h = (((h << 5) + h) ^ chave[i++]) & 0xffffffff;
+
+    return h % tamanho;
+}
+
 /*================================================================================*/
-void mostraTabela(tabela_dispersao *td)
-{
+void mostraTabela(tabela_dispersao *td) {
     int i;
     td_elemento * elem;
     printf("TABELA DE DISPERSAO (%d elementos)\n", tabela_numelementos(td));

@@ -50,19 +50,18 @@ void heap_apaga(heap *h) {
 	free(h);
 }
 
-elemento * elemento_novo(int prioridade, int valor) {
+elemento * elemento_novo(int valor) {
 	elemento * elem = (elemento *) malloc(sizeof(elemento));
 
 	if (!elem)
 		return NULL;
 
 	elem->valor = valor;
-	elem->prioridade = prioridade;
 
 	return elem;
 }
 
-int heap_insere(heap * h, int valor, int prioridade) {
+int heap_insere(heap * h, int valor) {
 	elemento * aux, * elem;
 	int i;
 
@@ -70,7 +69,7 @@ int heap_insere(heap * h, int valor, int prioridade) {
 	if (h->tamanho >= h->capacidade)
 		return 0;
 
-	elem = elemento_novo(prioridade, valor);
+	elem = elemento_novo(valor);
 	if (!elem)
 		return 0;
 
@@ -176,7 +175,7 @@ void mostraHeap(heap *h, int indice) {
 		for(i = 0; i < 3 * nivel; i++)
 			printf("     ");
 
-		printf("%d (%d)\n",h->elementos[indice]->valor, h->elementos[indice]->prioridade);
+		printf("%d\n",h->elementos[indice]->valor);
 
 		mostraHeap(h, FILHO_DIR(indice));
 	}
@@ -189,12 +188,12 @@ int menor_que(elemento * e1, elemento * e2) {
 	if (e1 == NULL || e2 == NULL)
 		return 0;
 
-	return e1->prioridade < e2->prioridade;
+	return e1->valor < e2->valor;
 }
 
 int maior_que(elemento * e1, elemento * e2) {
 	if (e1 == NULL || e2 == NULL)
 		return 0;
 
-	return e1->prioridade > e2->prioridade;
+	return e1->valor > e2->valor;
 }

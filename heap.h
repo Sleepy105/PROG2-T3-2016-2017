@@ -9,7 +9,6 @@
 #define MAXHEAP 1
 
 typedef struct {
-	int prioridade;
 	int valor;
 } elemento;
 
@@ -33,7 +32,7 @@ heap* heap_nova(int tamanho_maximo, int tipo_de_heap);
 void heap_apaga(heap *h);
 
 /* insere elemento na heap com uma determinada prioridade */
-int heap_insere(heap *h, int valor, int prioridade);
+int heap_insere(heap *h, int valor);
 
 /* remove elemento na raiz da heap */
 int heap_remove(heap *h);

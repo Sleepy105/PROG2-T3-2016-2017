@@ -8,72 +8,125 @@
 #define ALL_GOOD  1
 
 heap *min, *max;
+float m;
 
 tabela_dispersao* td = NULL;
 objeto* mode = NULL;
 
 void median_initModule(int maxTransactions) {
-  min = heap_nova(maxTransactions/2 + 1, MINHEAP);
-  max = heap_nova(maxTransactions/2, MAXHEAP);
+    min = heap_nova(maxTransactions/2 + 1, MINHEAP);
+    max = heap_nova(maxTransactions/2, MAXHEAP);
+    m = 0;
 }
 
 int median_newObservation(int numActions, float *updatedMedian) {
-  if(!heap_insere(max, numActions, numActions))
-    return ERROR;
+    if(max == NULL || min == NULL)
+        return ERROR;
 
-  if(max->tamanho - min->tamanho > 1) {
-    int aux = heap_remove(max);
-    if(aux == -1)
-      return ERROR;
-    
-    if(!heap_insere(min, aux, aux))
-      return ERROR;
-  }
+    switch(max->tamanho - min->tamanho) {
+        case 1: // Left-heavy
 
-  if(min->elementos[0] != NULL && max->elementos[0]->valor > min->elementos[0]->valor) {
-    int aux = heap_remove(max);
-    int aux2 = heap_remove(min);
-    
-    if(!heap_insere(min, aux, aux))
-      return ERROR;
-    if(!heap_insere(max, aux2, aux2))
-      return ERROR;
-  }
+            if(numActions < m) {
+                int aux = heap_remove(max);
+                if(aux == -1)
+                    return ERROR;
+                
+                if(!heap_insere(min, aux))
+                    return ERROR;
+                
+                if(!heap_insere(max, numActions))
+                    return ERROR;
+            }
+            else {
+                if(!heap_insere(min, numActions))
+                    return ERROR;
+            }
 
-  if( (max->tamanho + min->tamanho) % 2 )
-    *updatedMedian = max->elementos[0]->valor;
-  else
-    *updatedMedian = (float)(max->elementos[0]->valor + min->elementos[0]->valor) / 2;
+            // Agora ambas as heaps têm o mesmo número de elementos
+            m = *updatedMedian = (float)(max->elementos[0]->valor + min->elementos[0]->valor) / 2;
+
+            break;
+
+        case 0: // Balanced
+
+            if(numActions < m) {
+                if(!heap_insere(max, numActions))
+                    return ERROR;
+                m = *updatedMedian = (float)(max->elementos[0]->valor);
+            }
+            else {
+                if(!heap_insere(min, numActions))
+                    return ERROR;
+                m = *updatedMedian = (float)(min->elementos[0]->valor);
+            }
+
+            break;
+
+        case -1: // Right-heavy
+
+            if(numActions < m) {
+                if(!heap_insere(max, numActions))
+                    return ERROR;
+            }
+            else {
+                int aux = heap_remove(min);
+                if(aux == -1)
+                    return ERROR;
+                
+                if(!heap_insere(max, aux))
+                    return ERROR;
+                
+                if(!heap_insere(min, numActions))
+                    return ERROR;
+            }
+
+            m = *updatedMedian = (float)(max->elementos[0]->valor + min->elementos[0]->valor) / 2;
+
+            break;
+    }
+
+    /* Determina mediana 
+    if( (max->tamanho + min->tamanho) % 2 )
+        m = *updatedMedian = max->elementos[0]->valor;
+    else
+        m = *updatedMedian = (float)(max->elementos[0]->valor + min->elementos[0]->valor) / 2;*/
   
-  /*mostraHeap(max, 0);
-  printf("______________________\n");
-  mostraHeap(min, 0);
-  printf("pppppppppppppppppppppp\n");*/
+    /*mostraHeap(max, 0);
+    printf("______________________\n");
+    mostraHeap(min, 0);
+    printf("pppppppppppppppppppppp\n");*/
 
-  return ALL_GOOD;
+    return ALL_GOOD;
 }
 
 void median_closeModule() {
-  heap_apaga(min);
-  heap_apaga(max);
+    heap_apaga(min);
+    heap_apaga(max);
+    m = 0;
 }
 
 void mode_initModule(int maxTransactions) {
-  td = tabela_nova(maxTransactions/3, &hash_djbm);
+    td = tabela_nova(maxTransactions, &hash_djb2m);
 }
 
 int mode_newObservation(const char *companyName, char *updatedMode) {
-  objeto* obj;
+    objeto* obj;
 
-  if(tabela_insere(td, companyName, &obj) != TABDISPERSAO_OK)
-    return ERROR;
+    if(mode != NULL && strcmp(mode->chave, companyName) == 0) {
+        (mode->valor)++;
+        
+        strcpy(updatedMode, mode->chave);
+        return ALL_GOOD;
+    }
+    else if(tabela_insere(td, companyName, &obj) != TABDISPERSAO_OK)
+        return ERROR;
   
-  if(mode == NULL || obj->valor > mode->valor)
-    mode = obj;
+    if(mode == NULL || obj->valor > mode->valor)
+        mode = obj;
     
-  strcpy(updatedMode, mode->chave);
-  //printf("%s\n", updatedMode);
-  return ALL_GOOD;
+    strcpy(updatedMode, mode->chave);
+    //printf("%s\n", updatedMode);
+    return ALL_GOOD;
 }
 
 void mode_closeModule() {

@@ -142,6 +142,7 @@ unsigned long hash_krm(const char* chave, int tamanho);
  * observacao: (+) representa "ou exclusivo" que em C e' indicado por ^
  */
 unsigned long hash_djbm(const char *chave, int tamanho);
+unsigned long hash_djb2m(const char *chave, int tamanho);
 
 /**
  * Esta funcao imprime o estado actual da tabela para o ecra
