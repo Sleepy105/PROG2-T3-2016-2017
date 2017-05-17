@@ -19,7 +19,7 @@ void median_initModule(int maxTransactions) {
     m = 0;
 }
 
-inline int median_newObservation(int numActions, float *updatedMedian) {
+int median_newObservation(int numActions, float *updatedMedian) {
     if(max == NULL || min == NULL)
         return ERROR;
 
@@ -109,7 +109,7 @@ void mode_initModule(int maxTransactions) {
     td = tabela_nova(maxTransactions, &hash_djb2m);
 }
 
-inline int mode_newObservation(const char *companyName, char *updatedMode) {
+int mode_newObservation(const char *companyName, char *updatedMode) {
     td_elemento* elem;
 
     if(mode != NULL && strcmp(mode->chave, companyName) == 0) {

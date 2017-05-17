@@ -58,7 +58,7 @@ void tabela_apaga(tabela_dispersao *td) {
     free(td);
 }
 
-inline int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** elemento) {
+int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** elemento) {
     int index;
     register td_elemento * elem;
 
