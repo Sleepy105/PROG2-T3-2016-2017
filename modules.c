@@ -11,7 +11,7 @@ heap *min, *max;
 float m;
 
 tabela_dispersao* td = NULL;
-objeto* mode = NULL;
+td_elemento* mode = NULL;
 
 void median_initModule(int maxTransactions) {
     min = heap_nova(maxTransactions/2 + 1, MINHEAP);
@@ -19,7 +19,7 @@ void median_initModule(int maxTransactions) {
     m = 0;
 }
 
-int median_newObservation(int numActions, float *updatedMedian) {
+inline int median_newObservation(int numActions, float *updatedMedian) {
     if(max == NULL || min == NULL)
         return ERROR;
 
@@ -109,8 +109,8 @@ void mode_initModule(int maxTransactions) {
     td = tabela_nova(maxTransactions, &hash_djb2m);
 }
 
-int mode_newObservation(const char *companyName, char *updatedMode) {
-    objeto* obj;
+inline int mode_newObservation(const char *companyName, char *updatedMode) {
+    td_elemento* elem;
 
     if(mode != NULL && strcmp(mode->chave, companyName) == 0) {
         (mode->valor)++;
@@ -118,18 +118,18 @@ int mode_newObservation(const char *companyName, char *updatedMode) {
         strcpy(updatedMode, mode->chave);
         return ALL_GOOD;
     }
-    else if(tabela_insere(td, companyName, &obj) != TABDISPERSAO_OK)
+    else if(tabela_insere(td, companyName, &elem) != TABDISPERSAO_OK)
         return ERROR;
   
-    if(mode == NULL || obj->valor > mode->valor)
-        mode = obj;
+    if(mode == NULL || elem->valor > mode->valor)
+        mode = elem;
     
     strcpy(updatedMode, mode->chave);
     return ALL_GOOD;
 }
 
 void mode_closeModule() {
-  tabela_apaga(td);
-  mode = NULL;
-  td = NULL;
+    tabela_apaga(td);
+    mode = NULL;
+    td = NULL;
 }

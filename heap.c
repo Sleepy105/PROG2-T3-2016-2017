@@ -39,7 +39,7 @@ void heap_apaga(heap *h) {
 	free(h);
 }
 
-int heap_insere(heap * h, int valor) {
+inline int heap_insere(heap * h, int valor) {
 	int aux, i;
 
 	/* se heap esta' cheia, nao insere elemento */

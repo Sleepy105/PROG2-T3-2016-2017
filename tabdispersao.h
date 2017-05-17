@@ -17,33 +17,22 @@
 
 typedef unsigned long hash_func(const char *, int);
 
-/** conteudo individual da tabela de dispersao:
- * cada objeto tem uma chave e um texto associado
- */
-typedef struct
-{
+/** elemento da tabela de dispersao */
+typedef struct elem {
 	char chave[TAMANHO_CHAVE];
 	int valor;
-} objeto;
-
-/** elemento da tabela de dispersao */
-typedef struct elem
-{
-	objeto* obj;
 	struct elem * proximo;
 } td_elemento;
 
 /**
  * A estrutura tabela_dispersao para armazenar dados relativos a uma tabela de dispersao
  */
-struct tab_dispersao
-{
+typedef struct tab_dispersao {
 	hash_func *hfunc;		/* apontador para a funcao a ser usada (hash_djbm, hash_krm, ...) */
 	td_elemento **elementos;	/* vetor de elementos */
 	int tamanho;			/* tamanho do vetor de elementos */
-};
+}tabela_dispersao;
 
- typedef struct tab_dispersao tabela_dispersao;
 
 /**
  * cria uma tabela de dispersao
@@ -68,7 +57,7 @@ void tabela_apaga(tabela_dispersao *td);
  * retorno: caso contrario deve devolver TABDISPERSAO_ERRO ou TABDISPERSAO_INVALIDA
  * observacao: valor deve ser copiado para outro local em memoria.
  */
-int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj);
+int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** elemento);
 
 /**
  * remove um valor da tabela
@@ -118,7 +107,7 @@ int tabela_numelementos(tabela_dispersao *td);
  * parametro: td tabela de dispersao
  * retorno: vetor com os objetos da tabela ou NULL se nao existir tabela ou tabela vazia
  */
-objeto* tabela_elementos(tabela_dispersao *td, int *n);
+td_elemento* tabela_elementos(tabela_dispersao *td, int *n);
 
 /**
  * calcula hash com base na seguinte formula:

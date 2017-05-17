@@ -15,15 +15,19 @@ tabela_dispersao* tabela_nova(int tamanho, hash_func *hfunc) {
     tabela_dispersao *t = (tabela_dispersao*) malloc(sizeof (tabela_dispersao));
     if (t == NULL)
         return NULL;
+    
+    /* Determina tamanho optimo para a tabela de tabela de dispersao */
+    t->tamanho = 1;
+    while(t->tamanho < tamanho)
+        t->tamanho <<= 1;
 
     /* aloca memoria para os elementos */
-    t->elementos = (td_elemento **) calloc(tamanho, sizeof (td_elemento*));
+    t->elementos = (td_elemento **) calloc(t->tamanho, sizeof (td_elemento*));
     if (t->elementos == NULL) {
         free(t);
         return NULL;
     }
 
-    t->tamanho = tamanho;
     t->hfunc = hfunc;
 
     return t;
@@ -44,7 +48,6 @@ void tabela_apaga(tabela_dispersao *td) {
         {
             /* liberta cada elemento */
             aux = elem->proximo;
-            free(elem->obj);
             free(elem);
             elem = aux;
         }
@@ -55,9 +58,9 @@ void tabela_apaga(tabela_dispersao *td) {
     free(td);
 }
 
-int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj) {
+inline int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** elemento) {
     int index;
-    td_elemento * elem;
+    register td_elemento * elem;
 
     if (!td || !chave) return TABDISPERSAO_ERRO;
 
@@ -66,7 +69,7 @@ int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj) {
 
     /* verifica se chave ja' existe na lista */
     elem = td->elementos[index];
-    while (elem != NULL && strcmp(elem->obj->chave, chave) != 0)
+    while (elem != NULL && strcmp(elem->chave, chave) != 0)
         elem = elem->proximo;
 
     if (elem == NULL)
@@ -78,14 +81,9 @@ int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj) {
         if (elem == NULL)
             return TABDISPERSAO_ERRO;
 
-        /* aloca memoria para o objeto */
-        elem->obj = (objeto*) malloc(sizeof (objeto));
-        if (elem->obj == NULL)
-            return TABDISPERSAO_ERRO;
-
         /* copia chave e valor */
-        strcpy(elem->obj->chave, chave);
-        elem->obj->valor = 0;
+        strcpy(elem->chave, chave);
+        elem->valor = 0;
 
         /* insere no inicio da lista */
         elem->proximo = td->elementos[index];
@@ -93,10 +91,10 @@ int tabela_insere(tabela_dispersao *td, const char *chave, objeto** obj) {
 
     } else {
         /* chave repetida, simplesmente atualiza o valor */
-        (elem->obj->valor)++;
+        (elem->valor)++;
     }
 
-    *obj = elem->obj;
+    *elemento = elem;
     return TABDISPERSAO_OK;
 }
 
@@ -116,14 +114,13 @@ int tabela_remove(tabela_dispersao *td, const char *chave) {
     while(elem != NULL)
     {
         /* se for a string que se procura, e' removida */
-        if (strcmp(elem->obj->chave, chave) == 0)
+        if (strcmp(elem->chave, chave) == 0)
         {
             /* se nao for a primeira da lista */
             if (aux != NULL)
                 aux->proximo = elem->proximo;
             else
                 td->elementos[index] = elem->proximo;
-            free(elem->obj);
             free(elem);
 
             return TABDISPERSAO_OK;
@@ -159,8 +156,8 @@ int tabela_valor(tabela_dispersao *td, const char *chave) {
 
     while(elem != NULL)
     {
-        if (!strcmp(elem->obj->chave, chave))
-            return elem->obj->valor;
+        if (!strcmp(elem->chave, chave))
+            return elem->valor;
         elem = elem->proximo;
     }
     return -1;
@@ -180,7 +177,6 @@ int tabela_esvazia(tabela_dispersao *td) {
         while(elem != NULL)
         {
             aux = elem->proximo;
-            free(elem->obj);
             free(elem);
             elem = aux;
         }
@@ -208,18 +204,18 @@ int tabela_numelementos(tabela_dispersao *td) {
     return count;
 }
 
-objeto * tabela_elementos(tabela_dispersao *td, int *n) {
-    objeto *v;
+td_elemento* tabela_elementos(tabela_dispersao *td, int *n) {
+    td_elemento *v;
     int i, j;
     td_elemento * elem;
-    objeto * valor;
+    td_elemento * valor;
 
     *n = tabela_numelementos(td);
 
     if ((*n) <= 0)
         return NULL;
 
-    v = (objeto*) malloc(sizeof(objeto)*(*n));
+    v = (td_elemento*) malloc(sizeof(td_elemento)*(*n));
     if (!v)
         return NULL;
 
@@ -230,7 +226,7 @@ objeto * tabela_elementos(tabela_dispersao *td, int *n) {
             elem = td->elementos[i];
             while (elem)
             {
-                valor = elem->obj;
+                valor = elem;
                 v[j++] = *valor;
                 elem = elem->proximo;
             }
@@ -266,9 +262,8 @@ unsigned long hash_djbm(const char* chave, int tamanho) {
 }
 
 unsigned long hash_djb2m(const char* chave, int tamanho) {
-    register unsigned long h, i;
-    i = 0;
-    h = 5381;
+    register unsigned long h = 5381,
+        i = 0;
 
     while(chave[i])
         h = (((h << 5) + h) ^ chave[i++]) & 0xffffffff;
@@ -289,7 +284,7 @@ void mostraTabela(tabela_dispersao *td) {
             elem = td->elementos[i];
             while (elem)
             {
-                printf(" : [\"%s\" :: \"%d\"]", elem->obj->chave, elem->obj->valor);
+                printf(" : [\"%s\" :: \"%d\"]", elem->chave, elem->valor);
                 elem = elem->proximo;
             }
             printf("\n");
