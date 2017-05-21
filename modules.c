@@ -19,7 +19,7 @@ void median_initModule(int maxTransactions) {
     m = 0;
 }
 
-int median_newObservation(int numActions, float *updatedMedian) {
+inline int median_newObservation(int numActions, float *updatedMedian) {
     if(max == NULL || min == NULL)
         return ERROR;
 
@@ -102,6 +102,8 @@ int median_newObservation(int numActions, float *updatedMedian) {
 void median_closeModule() {
     heap_apaga(min);
     heap_apaga(max);
+    min = NULL;
+    max = NULL;
     m = 0;
 }
 

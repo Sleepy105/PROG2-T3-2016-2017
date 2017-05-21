@@ -39,8 +39,8 @@ void heap_apaga(heap *h) {
 	free(h);
 }
 
-int heap_insere(heap * h, int valor) {
-	int aux, i;
+inline int heap_insere(heap * h, int valor) {
+	register int aux, i;
 
 	/* se heap esta' cheia, nao insere elemento */
 	if (h->tamanho >= h->capacidade)
@@ -76,7 +76,7 @@ int heap_insere(heap * h, int valor) {
 }
 
 int heap_remove(heap * h) {
-	int i, filho_maior, filho_menor, aux, ret;
+	register int i, filho_maior, filho_menor, aux, ret;
 
 	/* se heap estiver vazia, nao remove elemento */
 	if (!h || h->tamanho <= 0)
@@ -93,13 +93,15 @@ int heap_remove(heap * h) {
 
 	/* enquanto nao chegar 'a base da heap */
 	while(FILHO_ESQ(i) < h->tamanho) {
-		filho_maior = FILHO_ESQ(i);
-		filho_menor = FILHO_DIR(i);
-
+		
 		/* verifica se existe filho 'a direita e se este e' mais prioritario do que 'a esquerda */
 		if (FILHO_DIR(i) < h->tamanho && h->elementos[FILHO_DIR(i)] < h->elementos[FILHO_ESQ(i)]) {
 			filho_maior = FILHO_DIR(i);
 			filho_menor = FILHO_ESQ(i);
+		}
+		else {
+			filho_maior = FILHO_ESQ(i);
+			filho_menor = FILHO_DIR(i);
 		}
 
 		/* enquanto elemento for mais prioritario do que o respetivo pai, troca-os */

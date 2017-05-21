@@ -58,7 +58,7 @@ void tabela_apaga(tabela_dispersao *td) {
     free(td);
 }
 
-int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** elemento) {
+inline int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** elemento) {
     int index;
     register td_elemento * elem;
 
@@ -69,7 +69,7 @@ int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** element
 
     /* verifica se chave ja' existe na lista */
     elem = td->elementos[index];
-    while (elem != NULL && strcmp(elem->chave, chave) != 0)
+    while (elem != NULL && strncmp(elem->chave, chave, TAMANHO_CHAVE) != 0)
         elem = elem->proximo;
 
     if (elem == NULL)
@@ -82,8 +82,8 @@ int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** element
             return TABDISPERSAO_ERRO;
 
         /* copia chave e valor */
-        strcpy(elem->chave, chave);
-        elem->valor = 0;
+        strncpy(elem->chave, chave, TAMANHO_CHAVE);
+        elem->valor = 1;
 
         /* insere no inicio da lista */
         elem->proximo = td->elementos[index];
@@ -114,7 +114,7 @@ int tabela_remove(tabela_dispersao *td, const char *chave) {
     while(elem != NULL)
     {
         /* se for a string que se procura, e' removida */
-        if (strcmp(elem->chave, chave) == 0)
+        if (strncmp(elem->chave, chave, TAMANHO_CHAVE) == 0)
         {
             /* se nao for a primeira da lista */
             if (aux != NULL)
@@ -156,7 +156,7 @@ int tabela_valor(tabela_dispersao *td, const char *chave) {
 
     while(elem != NULL)
     {
-        if (!strcmp(elem->chave, chave))
+        if (!strncmp(elem->chave, chave, TAMANHO_CHAVE))
             return elem->valor;
         elem = elem->proximo;
     }
@@ -261,7 +261,7 @@ unsigned long hash_djbm(const char* chave, int tamanho) {
     return h % tamanho;
 }
 
-unsigned long hash_djb2m(const char* chave, int tamanho) {
+inline unsigned long hash_djb2m(const char* chave, int tamanho) {
     register unsigned long h = 5381,
         i = 0;
 
