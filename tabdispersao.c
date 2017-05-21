@@ -59,7 +59,7 @@ void tabela_apaga(tabela_dispersao *td) {
 }
 
 inline int tabela_insere(tabela_dispersao *td, const char *chave, td_elemento** elemento) {
-    int index;
+    register int index;
     register td_elemento * elem;
 
     if (!td || !chave) return TABDISPERSAO_ERRO;

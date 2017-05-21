@@ -114,7 +114,7 @@ void mode_initModule(int maxTransactions) {
 int mode_newObservation(const char *companyName, char *updatedMode) {
     td_elemento* elem;
 
-    if(mode != NULL && strcmp(mode->chave, companyName) == 0) {
+    if(mode != NULL && strncmp(mode->chave, companyName, TAMANHO_CHAVE) == 0) {
         (mode->valor)++;
         
         strcpy(updatedMode, mode->chave);

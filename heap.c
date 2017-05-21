@@ -5,7 +5,6 @@
 #include "heap.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define RAIZ 			(0)
 #define PAI(x) 			((x-1)/2)
